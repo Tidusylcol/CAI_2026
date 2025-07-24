@@ -13,7 +13,7 @@ app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+    const response = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.HF_API_KEY}`,
