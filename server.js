@@ -13,14 +13,14 @@ app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct",
+        model: "mistral-small",  // ou mistral-medium, mistral-large si autorisé
         messages: [
           { role: "user", content: userMessage }
         ]
@@ -29,8 +29,8 @@ app.post('/api/chat', async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Erreur OpenRouter (Mistral):", errorText);
-      return res.json({ reply: "Erreur OpenRouter : Mistral est indisponible ou la clé est invalide." });
+      console.error("Erreur Mistral:", errorText);
+      return res.json({ reply: "Erreur Mistral : modèle indisponible ou clé invalide." });
     }
 
     const data = await response.json();
@@ -38,8 +38,8 @@ app.post('/api/chat', async (req, res) => {
 
     res.json({ reply: aiResponse });
   } catch (error) {
-    console.error("Erreur OpenRouter:", error);
-    res.status(500).json({ reply: "Erreur de communication avec OpenRouter." });
+    console.error("Erreur Mistral:", error);
+    res.status(500).json({ reply: "Erreur de communication avec le serveur Mistral." });
   }
 });
 
