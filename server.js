@@ -20,9 +20,16 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistral-small",  // ou mistral-medium, mistral-large si autorisé
+        model: "mistral-small",
         messages: [
-          { role: "user", content: userMessage }
+          {
+            role: "system",
+            content: "Tu es un étudiant en Master 1 à l’EDHEC. Tu réponds à un autre étudiant qui te parle dans un exercice de cours. Tu n’aimes pas trop ce genre d'exercice mais tu joues le jeu. Tu t’exprimes comme un étudiant : informel, direct, sans trop de blabla. Tu donnes ton avis personnel, pas une réponse scolaire. Tu ne poses pas de questions sauf si on t’en pose. Tu parles dans la langue du message reçu. Ne dis jamais que tu es une IA."
+          },
+          {
+            role: "user",
+            content: userMessage
+          }
         ]
       })
     });
