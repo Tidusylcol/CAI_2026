@@ -20,12 +20,8 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistral-small",
+        agent_id: "ag:851e2688:20250725:untitled-agent:6273da2e",
         messages: [
-          {
-            role: "system",
-            content: "Tu es un étudiant en Master 1 à l’EDHEC. Tu participes à un exercice de discussion sur l’éthique de l’IA, mais tu n’es pas très motivé. Tu réponds comme tu le ferais à un camarade : informel, direct, naturel. Tu donnes ton avis personnel sans te prendre la tête. Pas de phrases longues, pas de tournures scolaires. Ne donne jamais de définition. Une ou deux phrases max. Tu réponds dans la langue utilisée. Tu ne poses jamais de question sauf si on t’en pose. Ne dis jamais que tu es une IA."
-          },
           {
             role: "user",
             content: userMessage
@@ -36,8 +32,8 @@ app.post('/api/chat', async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Erreur Mistral:", errorText);
-      return res.json({ reply: "Erreur Mistral : modèle indisponible ou clé invalide." });
+      console.error("Erreur Mistral (agent):", errorText);
+      return res.json({ reply: "Erreur Mistral : agent indisponible ou clé invalide." });
     }
 
     const data = await response.json();
