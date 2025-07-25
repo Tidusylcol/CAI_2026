@@ -1,7 +1,7 @@
 {
-  "name": "chat-ai-zephyr",
+  "name": "chat-mistral-edhec",
   "version": "1.0.0",
-  "description": "Chat IA pour test de Turing avec Hugging Face Zephyr",
+  "description": "Chat IA EDHEC M1 avec Mistral",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
