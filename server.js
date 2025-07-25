@@ -13,28 +13,33 @@ app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.HF_API_KEY}`,
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ inputs: userMessage })
+      body: JSON.stringify({
+        model: "meta-llama/llama-3-8b-instruct",
+        messages: [
+          { role: "user", content: userMessage }
+        ]
+      })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Erreur HuggingFace:", errorText);
-      return res.json({ reply: "Erreur HuggingFace : modèle introuvable ou indisponible." });
+      console.error("Erreur OpenRouter:", errorText);
+      return res.json({ reply: "Erreur OpenRouter : le modèle LLaMA est indisponible ou la clé est invalide." });
     }
 
     const data = await response.json();
-    const aiResponse = data[0]?.generated_text || "Je n'ai pas compris.";
+    const aiResponse = data.choices?.[0]?.message?.content || "Je n'ai pas compris.";
 
     res.json({ reply: aiResponse });
   } catch (error) {
-    console.error("Erreur HuggingFace:", error);
-    res.status(500).json({ reply: "Erreur de communication avec le serveur Hugging Face." });
+    console.error("Erreur OpenRouter:", error);
+    res.status(500).json({ reply: "Erreur de communication avec OpenRouter." });
   }
 });
 
