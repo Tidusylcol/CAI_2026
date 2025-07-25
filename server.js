@@ -20,7 +20,7 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3-8b-instruct",
+        model: "mistralai/mistral-7b-instruct",
         messages: [
           { role: "user", content: userMessage }
         ]
@@ -29,8 +29,8 @@ app.post('/api/chat', async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Erreur OpenRouter:", errorText);
-      return res.json({ reply: "Erreur OpenRouter : le modèle LLaMA est indisponible ou la clé est invalide." });
+      console.error("Erreur OpenRouter (Mistral):", errorText);
+      return res.json({ reply: "Erreur OpenRouter : Mistral est indisponible ou la clé est invalide." });
     }
 
     const data = await response.json();
