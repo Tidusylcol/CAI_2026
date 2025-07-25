@@ -5,7 +5,7 @@ body {
   padding: 0;
 }
 .container {
-  max-width: 600px;
+  max-width: 700px;
   margin: 40px auto;
   background: #fff;
   border-radius: 8px;
@@ -50,4 +50,16 @@ button {
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.timer {
+  font-size: 1rem;
+  background: #eef;
+  padding: 4px 12px;
+  border-radius: 8px;
 }

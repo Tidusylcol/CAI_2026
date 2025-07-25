@@ -2,15 +2,18 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat IA</title>
+  <title>Chat IA - M1 EDHEC</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Discussion avec l'IA</h1>
+    <div class="header">
+      <h1>Discussion avec un autre étudiant</h1>
+      <div class="timer" id="timer">05:00</div>
+    </div>
     <div class="chat-box" id="chatBox"></div>
     <form id="chatForm">
-      <input type="text" id="userInput" placeholder="Écrivez votre message..." required />
+      <input type="text" id="userInput" placeholder="Écris ton message..." required />
       <button type="submit">Envoyer</button>
     </form>
   </div>
