@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const fetch = require('node-fetch');
 require('dotenv').config();
@@ -6,48 +7,71 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Fichiers statiques (public/index.html, public/script.js, public/style.css, etc.)
 app.use(express.static('public'));
 app.use(express.json());
 
+// Historique pour download
+let history = [];
+
+/**
+ * Endpoint principal: envoie le message à TON AGENT Mistral
+ * Endpoint Mistral: POST https://api.mistral.ai/v1/agents/completions
+ * Body: { agent_id, messages: [...], max_tokens, temperature }
+ */
 app.post('/api/chat', async (req, res) => {
-  const userMessage = req.body.message;
+  const userMessage = (req.body?.message || '').toString().trim();
+  if (!userMessage) return res.json({ reply: "Dis-moi quelque chose ;)" });
+
+  // On loggue côté serveur pour le bouton 'Télécharger la conversation'
+  history.push({ sender: 'user', text: userMessage });
 
   try {
-    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
-      method: "POST",
+    const r = await fetch('https://api.mistral.ai/v1/agents/completions', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "mistral-small",
+        agent_id: 'ag:851e2688:20250725:untitled-agent:6273da2e',
         messages: [
-          {
-            role: "system",
-            content: "Tu es un étudiant en Master 1 à l’EDHEC. Tu participes à un exercice de discussion sur l’éthique de l’IA, mais tu n’es pas très motivé. Tu réponds comme tu le ferais à un camarade : informel, direct, naturel. Tu donnes ton avis personnel sans te prendre la tête. Pas de phrases longues, pas de tournures scolaires. Ne donne jamais de définition. Une ou deux phrases max. Tu réponds dans la langue utilisée. Tu ne poses jamais de question sauf si on t’en pose. Ne dis jamais que tu es une IA."
-          },
-          {
-            role: "user",
-            content: userMessage
-          }
-        ]
+          { role: 'user', content: userMessage }
+        ],
+        max_tokens: 50,     // force des réponses courtes
+        temperature: 0.5    // un peu de variété mais reste cadré
       })
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Erreur Mistral:", errorText);
-      return res.json({ reply: "Erreur Mistral : modèle indisponible ou clé invalide." });
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('Erreur Mistral (agent):', txt);
+      return res.status(502).json({ reply: "Oups, souci côté agent. Réessaie." });
     }
 
-    const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content || "Je n'ai pas compris.";
+    const data = await r.json();
+    const reply = data?.choices?.[0]?.message?.content || "Je n'ai pas compris.";
+    history.push({ sender: 'bot', text: reply });
 
-    res.json({ reply: aiResponse });
-  } catch (error) {
-    console.error("Erreur Mistral:", error);
-    res.status(500).json({ reply: "Erreur de communication avec le serveur Mistral." });
+    res.json({ reply });
+  } catch (err) {
+    console.error('Erreur Mistral (agent):', err);
+    res.status(500).json({ reply: "Erreur réseau/serveur avec Mistral." });
   }
+});
+
+/**
+ * Endpoint de téléchargement de la conversation
+ * Retourne un .txt simple
+ */
+app.get('/api/download', (req, res) => {
+  let content = "Conversation (Étudiant EDHEC) — export\n\n";
+  history.forEach(msg => {
+    content += (msg.sender === 'user' ? "Vous: " : "Étudiant: ") + msg.text + "\n";
+  });
+  res.setHeader('Content-Disposition', 'attachment; filename=conversation.txt');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.send(content);
 });
 
 app.listen(PORT, () => {
