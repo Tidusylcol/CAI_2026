@@ -34,7 +34,7 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        agent_id: 'ag:851e2688:20250725:untitled-agent:6273da2e',
+        agent_id: 'ag:851e2688:20250725:untitled-agent:6273da2e'
         messages: [
           { role: 'user', content: userMessage }
         ],
