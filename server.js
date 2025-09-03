@@ -11,19 +11,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static('public'));
 app.use(express.json());
 
-// Historique pour download
+// Historique pour téléchargement
 let history = [];
 
-/**
- * Endpoint principal: envoie le message à TON AGENT Mistral
- * Endpoint Mistral: POST https://api.mistral.ai/v1/agents/completions
- * Body: { agent_id, messages: [...], max_tokens, temperature }
- */
 app.post('/api/chat', async (req, res) => {
   const userMessage = (req.body?.message || '').toString().trim();
   if (!userMessage) return res.json({ reply: "Dis-moi quelque chose ;)" });
 
-  // On loggue côté serveur pour le bouton 'Télécharger la conversation'
   history.push({ sender: 'user', text: userMessage });
 
   try {
@@ -34,12 +28,12 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        agent_id: 'ag:851e2688:20250725:untitled-agent:6273da2e'
+        agent_id: 'ag:851e2688:20250725:untitled-agent:6273da2e',
         messages: [
           { role: 'user', content: userMessage }
         ],
-        max_tokens: 50,     // force des réponses courtes
-        temperature: 0.5    // un peu de variété mais reste cadré
+        max_tokens: 50   // ✅ autorisé
+        // ❌ PAS de temperature ici !
       })
     });
 
@@ -60,12 +54,9 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-/**
- * Endpoint de téléchargement de la conversation
- * Retourne un .txt simple
- */
+// Endpoint pour télécharger la conversation
 app.get('/api/download', (req, res) => {
-  let content = "Conversation (Étudiant EDHEC) — export\n\n";
+  let content = "Conversation (Étudiant EDHEC)\n\n";
   history.forEach(msg => {
     content += (msg.sender === 'user' ? "Vous: " : "Étudiant: ") + msg.text + "\n";
   });
